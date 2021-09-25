@@ -41,7 +41,7 @@ type StateCoor struct {
 	StateName string `json:"text"`
 }
 
-func GetStateData(longitude string, latitude string) string {
+func CordToState(longitude string, latitude string) string {
 	url := "https://api.mapbox.com/geocoding/v5/mapbox.places/" + longitude + "," + latitude + ".json?types=region&access_token=pk.eyJ1IjoieW9nZXNoOTY0MyIsImEiOiJja3A3NjBlaXIwNmpvMnZtcnZ0ZDJ2dGxmIn0.yw2cd7raPthzGXL6BW3Tnw"
 	resp, err := http.Get(url)
 	if err != nil {
@@ -140,23 +140,34 @@ func update() {
 	json.Unmarshal(body, &statelist)
 
 	db := client.Database("covid")
-	stateData := db.Collection("StateData")
+	stateData := db.Collection("StateData") //StateData
+	fmt.Println("Length")
 
-	for i := 0; i < len(statelist.Statelist); i++ {
-		filter := bson.D{{"state", statelist.Statelist[i].State}}
+	var data State
+	filter := bson.D{{"state", "Delhi"}}
+	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
+		fmt.Print(err)
+		fetch()
 
-		update := bson.D{
-			{"$set", bson.D{
-				{"confirmed", statelist.Statelist[i].Confirmed},
-				{"active", statelist.Statelist[i].Active},
-				{"lastupdatedtime", statelist.Statelist[i].Lastupdatedtime},
-			}},
+	} else {
+		for i := 0; i < len(statelist.Statelist); i++ {
+			filter := bson.D{{"state", statelist.Statelist[i].State}}
+
+			update := bson.D{
+				{"$set", bson.D{
+					{"confirmed", statelist.Statelist[i].Confirmed},
+					{"active", statelist.Statelist[i].Active},
+					{"lastupdatedtime", statelist.Statelist[i].Lastupdatedtime},
+				}},
+			}
+			stateData.UpdateOne(ctx, filter, update)
+
+			//fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
+
 		}
-		stateData.UpdateOne(ctx, filter, update)
-
-		//fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
-
 	}
+	fmt.Print(data)
+
 }
 func fetchtoDB(c echo.Context) error {
 	update()
@@ -174,7 +185,7 @@ func stateCovid(c echo.Context) error {
 	//log.Printf(longitude, latitude, err)
 	fmt.Print(x, y)
 	var cases State
-	state := GetStateData(x, y)
+	state := CordToState(x, y)
 	fmt.Print(state)
 	cases = stateCases(state)
 	fmt.Print(cases)
@@ -184,10 +195,12 @@ func stateCovid(c echo.Context) error {
 }
 func main() {
 	e := echo.New()
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.GET("/state", stateCovid)
 	e.GET("/fetchtodb", fetchtoDB)
 	e.Logger.Fatal(e.Start(":1323"))
+
 }
