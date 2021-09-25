@@ -19,20 +19,17 @@ import (
 )
 
 //Coordinate is a [longitude, latitude]
-type Users struct {
-	Users []User `json:"statewise"`
+type Statelist struct {
+	Statelist []State `json:"statewise"`
 }
 
-type User struct {
+type State struct {
 	Active          string `json:"active"`
 	Confirmed       string `json:"confirmed"`
 	Lastupdatedtime string `json:"lastupdatedtime"`
 	State           string `json:"state"`
 }
 
-type Coordinate [2]float64
-
-//mongodb+srv://Aniket:aniket11@cluster0.sau7y.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 // Connection URI
 const uri = "mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority"
 
@@ -80,18 +77,18 @@ func fetch() {
 		log.Fatalln(err)
 	}
 
-	var users Users
-	json.Unmarshal(body, &users)
+	var statelist Statelist
+	json.Unmarshal(body, &statelist)
 
 	db := client.Database("covid")
 	stateData := db.Collection("StateData")
 
-	for i := 0; i < len(users.Users); i++ {
+	for i := 0; i < len(statelist.Statelist); i++ {
 		Result, err := stateData.InsertOne(ctx, bson.D{
-			{Key: "state", Value: users.Users[i].State},
-			{Key: "active", Value: users.Users[i].Active},
-			{Key: "confirmed", Value: users.Users[i].Confirmed},
-			{Key: "lastupdatedtime", Value: users.Users[i].Lastupdatedtime},
+			{Key: "state", Value: statelist.Statelist[i].State},
+			{Key: "active", Value: statelist.Statelist[i].Active},
+			{Key: "confirmed", Value: statelist.Statelist[i].Confirmed},
+			{Key: "lastupdatedtime", Value: statelist.Statelist[i].Lastupdatedtime},
 		})
 
 		if err != nil {
@@ -101,7 +98,7 @@ func fetch() {
 		fmt.Printf("Inserted %v documents into State collection!\n", Result.InsertedID)
 	}
 }
-func stateCases(state string) User {
+func stateCases(state string) State {
 	clientOptions := options.Client().ApplyURI("mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -111,7 +108,7 @@ func stateCases(state string) User {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var data User
+	var data State
 	filter := bson.D{{"state", state}}
 	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
 		log.Fatal(err)
@@ -139,20 +136,20 @@ func update() {
 		log.Fatalln(err)
 	}
 
-	var users Users
-	json.Unmarshal(body, &users)
+	var statelist Statelist
+	json.Unmarshal(body, &statelist)
 
 	db := client.Database("covid")
 	stateData := db.Collection("StateData")
 
-	for i := 0; i < len(users.Users); i++ {
-		filter := bson.D{{"state", users.Users[i].State}}
+	for i := 0; i < len(statelist.Statelist); i++ {
+		filter := bson.D{{"state", statelist.Statelist[i].State}}
 
 		update := bson.D{
 			{"$set", bson.D{
-				{"confirmed", users.Users[i].Confirmed},
-				{"active", users.Users[i].Active},
-				{"lastupdatedtime", users.Users[i].Lastupdatedtime},
+				{"confirmed", statelist.Statelist[i].Confirmed},
+				{"active", statelist.Statelist[i].Active},
+				{"lastupdatedtime", statelist.Statelist[i].Lastupdatedtime},
 			}},
 		}
 		stateData.UpdateOne(ctx, filter, update)
@@ -176,7 +173,7 @@ func stateCovid(c echo.Context) error {
 
 	//log.Printf(longitude, latitude, err)
 	fmt.Print(x, y)
-	var cases User
+	var cases State
 	state := GetStateData(x, y)
 	fmt.Print(state)
 	cases = stateCases(state)
