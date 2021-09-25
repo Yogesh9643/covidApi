@@ -32,6 +32,7 @@ type User struct {
 
 type Coordinate [2]float64
 
+//mongodb+srv://Aniket:aniket11@cluster0.sau7y.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 // Connection URI
 const uri = "mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority"
 
