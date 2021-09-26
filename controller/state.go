@@ -9,32 +9,14 @@ import (
 	"net/http"
 	"time"
 
+	"covidApi/models"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//Coordinate is a [longitude, latitude]
-type Statelist struct {
-	Statelist []State `json:"statewise"`
-}
-
-type State struct {
-	Active          string `json:"active"`
-	Confirmed       string `json:"confirmed"`
-	Lastupdatedtime string `json:"lastupdatedtime"`
-	State           string `json:"state"`
-}
-
-type StateMapBox struct {
-	StateMapBox []StateCoor `json:"features"`
-}
-
-type StateCoor struct {
-	StateName string `json:"text"`
-}
-
-func Statecases(state string) State {
+func Statecases(state string) models.State {
 	clientOptions := options.Client().ApplyURI("mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -44,7 +26,7 @@ func Statecases(state string) State {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var data State
+	var data models.State
 	filter := bson.D{{"state", state}}
 	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
 		log.Fatal(err)
@@ -66,7 +48,7 @@ func CordToState(longitude string, latitude string) string {
 		log.Fatalln(err)
 	}
 
-	var statename StateMapBox
+	var statename models.StateMapBox
 	json.Unmarshal([]byte(body), &statename)
 	return statename.StateMapBox[0].StateName
 }

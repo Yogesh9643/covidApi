@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"covidApi/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -33,7 +34,7 @@ func fetch() {
 		log.Fatalln(err)
 	}
 
-	var statelist Statelist
+	var statelist models.Statelist
 	json.Unmarshal(body, &statelist)
 
 	db := client.Database("covid")
@@ -74,14 +75,14 @@ func Update() {
 		log.Fatalln(err)
 	}
 
-	var statelist Statelist
+	var statelist models.Statelist
 	json.Unmarshal(body, &statelist)
 
 	db := client.Database("covid")
 	stateData := db.Collection("StateData") //StateData
 	fmt.Println("Length")
 
-	var data State
+	var data models.State
 	filter := bson.D{{"state", "Delhi"}}
 	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
 		fmt.Print(err)
