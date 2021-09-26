@@ -2,7 +2,6 @@ package main
 
 import (
 	"covidApi/controller"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -40,13 +39,16 @@ func stateCovid(c echo.Context) error {
 	//log.Printf(longitude, latitude, err)
 	fmt.Print(x, y)
 
-	var state string = controller.CordToState(x, y)
-	fmt.Print(state)
-	cases := controller.Statecases(state)
-	fmt.Print(cases)
-	casesMarshal, err := json.Marshal(cases)
-	fmt.Print(err)
-	return c.String(http.StatusOK, string(casesMarshal))
+	// var state string = controller.CordToState(x, y)
+	// fmt.Print(state)
+	// cases := controller.Statecases(state)
+	// fmt.Print(cases)
+	// casesMarshal, err := json.Marshal(cases)
+	// fmt.Print(err)
+
+	var resp string = controller.Statecases(x, y)
+
+	return c.String(http.StatusOK, resp)
 }
 
 func fetchtoDB(c echo.Context) error {

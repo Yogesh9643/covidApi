@@ -16,7 +16,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Statecases(state string) models.Responsejson {
+func Statecases(x string, y string) string {
+
+	var state string = CordToState(x, y)
+
+	// cases := controller.Statecases(state)
+	// fmt.Print(cases)
+	// casesMarshal, err := json.Marshal(cases)
+
 	clientOptions := options.Client().ApplyURI("mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -26,6 +33,7 @@ func Statecases(state string) models.Responsejson {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var data models.State
 	filter := bson.D{{"state", state}}
 	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
@@ -45,7 +53,8 @@ func Statecases(state string) models.Responsejson {
 	indiatotal.Totalincountry = total.Confirmed
 
 	fmt.Print(indiatotal)
-	return indiatotal
+	resptotal, err := json.Marshal(indiatotal)
+	return string(resptotal)
 }
 
 func CordToState(longitude string, latitude string) string {
