@@ -49,7 +49,7 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "localhost:1323",
 	BasePath:    "/",
 	Schemes:     []string{"http"},
-	Title:       "Covid Api",
+	Title:       "Covid Api example",
 	Description: "This is a sample server server.",
 }
 

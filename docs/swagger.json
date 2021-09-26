@@ -5,7 +5,7 @@
     "swagger": "2.0",
     "info": {
         "description": "This is a sample server server.",
-        "title": "Covid Api",
+        "title": "Covid Api example",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",

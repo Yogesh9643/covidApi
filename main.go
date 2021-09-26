@@ -4,6 +4,7 @@ import (
 	"covidApi/controller"
 	"fmt"
 	"net/http"
+	"os"
 
 	_ "covidApi/docs"
 
@@ -11,21 +12,7 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-func stateCovid(c echo.Context) error {
-	var x string = c.QueryParam("longitude")
-	var y string = c.QueryParam("latitude")
-	fmt.Print(x, y)
-	var resp string = controller.Statecases(x, y)
-	return c.String(http.StatusOK, resp)
-}
-
-func fetchtoDB(c echo.Context) error {
-	controller.Update()
-	fmt.Print("updated")
-	return c.String(http.StatusOK, "Updated")
-}
-
-// @title Covid Api
+// @title Covid Api example
 // @version 1.0
 // @description This is a sample server server.
 // @termsOfService http://swagger.io/terms/
@@ -40,13 +27,40 @@ func fetchtoDB(c echo.Context) error {
 // @host localhost:1323
 // @BasePath /
 // @schemes http
+
+func stateCovid(c echo.Context) error {
+	var x string = c.QueryParam("longitude")
+	var y string = c.QueryParam("latitude")
+	fmt.Print(x, y)
+	var resp string = controller.Statecases(x, y)
+	return c.String(http.StatusOK, resp)
+}
+
+func fetchtoDB(c echo.Context) error {
+	controller.Update()
+	fmt.Print("updated")
+	return c.String(http.StatusOK, "Fetched covid cases from Covid API to DB for persisting data")
+}
+
 func main() {
+
+	port := os.Getenv("PORT")
+	address := fmt.Sprintf("%s:%s", "0.0.0.0", port)
 	e := echo.New()
+	// serverstatus godoc
+	// @Summary Show the status of server.
+	// @Description get the status of server.
+	// @Tags root
+	// @Accept */*
+	// @Produce json
+	// @Success 200 {object} map[string]interface{}
+	// @Router / [get]
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.String(http.StatusOK, "Welcome to covid echo api !")
 	})
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	e.GET("/state", stateCovid)
 	e.GET("/fetchtodb", fetchtoDB)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(address))
 }
