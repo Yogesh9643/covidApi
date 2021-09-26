@@ -3,7 +3,7 @@
 **Endpoints**<br/>
 **/**  -   GET request to check server is up and running and welcome message. <br/><br/>
 **/fetchtodb** - GET request to fetch data from open covid api and persist it in mongodb database and display message after updating.<br/><br/>
-**/state?longitude=value&latitude=value** -  GET request to fetch covid data for the state represented by given longitude and latitude and total cases in India.<br/>
+**/state?latitude=value&longitude=value** -  GET request to fetch covid data for the state represented by given longitude and latitude and total cases in India.<br/>
                                                  Set longitude and latitude at the position of *value*.  <br/><br/>
 
 This api is hosted at *https://nameless-reaches-06540.herokuapp.com/*.
