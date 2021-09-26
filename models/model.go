@@ -12,6 +12,14 @@ type State struct {
 	State           string `json:"state"`
 }
 
+type Responsejson struct {
+	Active          string `json:"active"`
+	Confirmed       string `json:"confirmed"`
+	Lastupdatedtime string `json:"lastupdatedtime"`
+	State           string `json:"state"`
+	Totalincountry  string `json:"totalconfirmedindia"`
+}
+
 type StateMapBox struct {
 	StateMapBox []StateCoor `json:"features"`
 }

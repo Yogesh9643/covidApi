@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Statecases(state string) models.State {
+func Statecases(state string) models.Responsejson {
 	clientOptions := options.Client().ApplyURI("mongodb+srv://yogesh9643:Chauhan123@cluster0.kkure.mongodb.net/coviddb?retryWrites=true&w=majority")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -31,9 +31,21 @@ func Statecases(state string) models.State {
 	if err = stateData.FindOne(ctx, filter).Decode(&data); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Confirmed")
-	fmt.Print(data)
-	return data
+
+	var total models.State
+	filter = bson.D{{"state", "Total"}}
+	if err = stateData.FindOne(ctx, filter).Decode(&total); err != nil {
+		log.Fatal(err)
+	}
+	var indiatotal models.Responsejson
+	indiatotal.Active = data.Active
+	indiatotal.Confirmed = data.Confirmed
+	indiatotal.Lastupdatedtime = data.Lastupdatedtime
+	indiatotal.State = data.State
+	indiatotal.Totalincountry = total.Confirmed
+
+	fmt.Print(indiatotal)
+	return indiatotal
 }
 
 func CordToState(longitude string, latitude string) string {
